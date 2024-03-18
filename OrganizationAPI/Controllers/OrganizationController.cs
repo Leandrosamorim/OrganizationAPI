@@ -49,7 +49,7 @@ namespace OrganizationAPI.Controllers
 
         }
 
-        [EnableCors("MatchAPI")]
+        [EnableCors("AllowSpecificOrigin")]
         [HttpGet]
         [Route("all")]
         public async Task<IActionResult> GetAll()
