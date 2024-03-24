@@ -33,10 +33,13 @@ namespace OrganizationAPI.Controllers
                 return BadRequest(ex);
             }
         }
-        [EnableCors("MatchAPI")]
+        [EnableCors("AllowSpecificOrigin")]
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] OrganizationQuery query)
         {
+            if (query.UId == null && query.Name == null)
+                query = new OrganizationQuery() { UId = new List<Guid> { Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UId")?.Value) } } ;
+
             try
             {
                 var organizations = await _organizationService.Get(query);

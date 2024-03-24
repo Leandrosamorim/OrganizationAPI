@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.ProjectNS.Interfaces;
+using Domain.ProjectNS.Services;
 
 namespace IoC
 {
@@ -22,6 +24,8 @@ namespace IoC
             services.AddDbContext<OrganizationDBContext>(option => option.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IOrganizationService, OrganizationService>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IProjectService, ProjectServices>();
             services.AddTransient<IMatchHttpService, MatchHttpService>();
             return services;
         }
