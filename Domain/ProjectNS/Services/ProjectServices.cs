@@ -1,5 +1,6 @@
 ﻿using Domain.DeveloperNS;
 using Domain.HttpService.Interfaces;
+using Domain.OrganizationNS;
 using Domain.ProjectNS.Interfaces;
 using Domain.ProjectNS.Queries;
 using System.Xml;
@@ -33,8 +34,27 @@ public class ProjectServices : IProjectService
 
     }
 
-    public async Task<IEnumerable<Project>> Get(ProjectQuery query)
-        => await _projectRepository.Get(query);
+    public async Task<IEnumerable<dynamic>> Get(ProjectQuery query)
+    {
+        var project = await _projectRepository.Get(query);
+        var developers = await _http.GetMyMatches(query.OrganizationId);
+
+        var developerIdsInProjects = project.SelectMany(project => project.Developers.Select(dp => dp.DeveloperId)).Distinct();
+
+        List<Developer> filteredDevelopers = developers.Where(developer => developerIdsInProjects.Contains(developer.UId)).ToList();
+
+        var result = project.Select(x => new
+        {
+            UId = x.UId,
+            Name = x.Name,
+            Description = x.Description,
+            Status = x.Status,
+            OrganizationId = x.OrganizationId,
+            Developers = filteredDevelopers
+        });
+        return result;
+
+    }
 
     public async Task<bool> AddProjectDeveloper(Guid developerId, Guid projectId, Guid organizationId)
     {
@@ -53,13 +73,37 @@ public class ProjectServices : IProjectService
 
     }
 
-    public async Task RemoveProjectDeveloper(ProjectDeveloper projectDeveloper)
-        => await _projectRepository.RemoveProjectDeveloper(projectDeveloper);
+    public async Task RemoveProjectDeveloper(Guid organizationId, Guid projectId, Guid developerId)
+    {
+        var projectList = await _projectRepository.Get(new ProjectQuery() { ProjectId = projectId });
+        var project = projectList.FirstOrDefault();
 
-    public async Task<Project> Update(Project organization)
-    => await _projectRepository.Update(organization);
+        if (project == null)
+            throw new Exception("Project Not Found");
+        else if (project.OrganizationId != organizationId)
+            throw new Exception("Project does not belong to this organization");
 
-    async Task IProjectService.Delete(Guid project)
-    => await _projectRepository.Delete(project);
+        await _projectRepository.RemoveProjectDeveloper(new ProjectDeveloper()
+        {
+            DeveloperId = developerId,
+            ProjectId = projectId
+        });
+    }
+
+    public async Task<Project> Update(Project project)
+    => await _projectRepository.Update(project);
+
+    public async Task<ICollection<Developer>> GetDevelopersByProject(Guid organizationId, Guid projectId)
+    {
+        var myDevs = await _http.GetMyMatches(organizationId);
+        var projectDevs = await _projectRepository.Get(new ProjectQuery() { ProjectId = projectId });
+        var presentUids = projectDevs.SelectMany(x => x.Developers)
+            .Select(x => x.DeveloperId)
+            .ToList();
+
+        var result = myDevs.Where(x => presentUids.Any(y => y == x.UId)).ToList();
+
+        return result;
+    }
 }
 

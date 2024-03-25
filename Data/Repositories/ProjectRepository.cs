@@ -3,6 +3,7 @@ using Domain.ProjectNS.Interfaces;
 using Domain.ProjectNS;
 using Domain.ProjectNS.Queries;
 using Microsoft.EntityFrameworkCore;
+using Domain.OrganizationNS;
 
 namespace Data.Repositories;
 public class ProjectRepository : IProjectRepository
@@ -33,9 +34,17 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<Project> Update(Project project)
     {
-        _context.Project.Update(project);
+        var projectModel = new
+        {
+            project.Name,
+            project.Description,
+            project.Status,
+        };
+        var projectToUpdate = _context.Project.FirstOrDefault(x => x.UId == project.UId);
+
+        _context.Project.Entry(projectToUpdate).CurrentValues.SetValues(projectModel);
         await _context.SaveChangesAsync();
-        return project;
+        return projectToUpdate;
     }
 
     public async Task Delete(Guid projectId)
@@ -53,7 +62,10 @@ public class ProjectRepository : IProjectRepository
 
     public async Task RemoveProjectDeveloper(ProjectDeveloper projectDeveloper)
     {
-        _context.ProjectDeveloper.Remove(projectDeveloper);
+        var projectDeveloperToRemove = _context.ProjectDeveloper.Where(x =>
+        x.ProjectId == projectDeveloper.ProjectId &&
+        x.DeveloperId == projectDeveloper.DeveloperId).FirstOrDefault();
+        _context.ProjectDeveloper.Remove(projectDeveloperToRemove);
         await _context.SaveChangesAsync();
     }
 }

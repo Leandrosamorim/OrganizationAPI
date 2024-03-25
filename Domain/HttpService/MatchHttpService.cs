@@ -34,7 +34,7 @@ namespace Domain.HttpService
 
         public async Task<IEnumerable<DeveloperDTO>> GetDevelopersToMatch(Guid organizationUId, int stackId)
         {
-            var url = _config.GetSection("MatchAPI").Value.ToString() + "api/OrganizationMatch?UId=" + organizationUId + "&stackId=" + stackId;
+            var url = _config.GetSection("MatchAPI").Value.ToString() + "api/OrganizationMatch?organizationUId=" + organizationUId + "&stackId=" + stackId;
             var response = await _client.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
