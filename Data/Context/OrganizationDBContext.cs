@@ -1,4 +1,5 @@
 ﻿using Domain.ContactNS;
+using Domain.DeveloperNS;
 using Domain.OrganizationNS;
 using Domain.ProjectNS;
 using Microsoft.EntityFrameworkCore;
@@ -23,17 +24,13 @@ namespace Data.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ProjectDeveloper>()
-                .HasKey(pd => new { pd.ProjectId, pd.DeveloperId });
+                .HasKey(pd => pd.UId);
 
-            modelBuilder.Entity<ProjectDeveloper>()
-                .HasOne(pd => pd.Project)
-                .WithMany(p => p.Developers)
-                .HasForeignKey(pd => pd.ProjectId);
-
-            modelBuilder.Entity<ProjectDeveloper>()
-                .HasOne(pd => pd.Developer)
-                .WithMany(d => d.ProjectDevelopers)
-                .HasForeignKey(pd => pd.DeveloperId);
+            modelBuilder.Entity<Project>()
+                .HasMany(pd => pd.Developers)
+                .WithOne()
+                .HasForeignKey(pd => pd.ProjectId)
+                .IsRequired(false);
         }
     }
 }

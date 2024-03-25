@@ -57,9 +57,22 @@ namespace Data.Repositories
 
         public async Task<Organization> Update(Organization organization)
         {
-            _context.Organization.Update(organization);
-            _context.SaveChanges();
-            return organization;
+            var orgModel = new
+            {
+                Name = organization.Name,
+                Description = organization.Description,
+                Contact = new
+                {
+                    Id = organization.Contact.Id,
+                    Phone = organization.Contact.Phone,
+                    Email = organization.Contact.Email
+                }
+            };
+            var organizationToUpdate = _context.Organization.FirstOrDefault(x => x.UId == organization.UId);
+
+            _context.Organization.Entry(organizationToUpdate).CurrentValues.SetValues(orgModel);
+            await _context.SaveChangesAsync();
+            return organizationToUpdate;
         }
     }
 }

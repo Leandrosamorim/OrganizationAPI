@@ -1,6 +1,7 @@
 ﻿using Domain.DeveloperNS;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Domain.ProjectNS;
 public class ProjectDeveloper
@@ -9,8 +10,5 @@ public class ProjectDeveloper
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid UId { get; set; }
     public Guid ProjectId { get; set; }
-    public Project Project { get; set; }
-
     public Guid DeveloperId { get; set; }
-    public Developer Developer { get; set; }
 }

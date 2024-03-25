@@ -16,8 +16,7 @@ public class Project
     public string? Name { get; set; }
     public string? Description { get; set; }
     public ProjectStatus Status { get; set; }
-    public ICollection<ProjectDeveloper> Developers { get; set; } = new List<ProjectDeveloper>();
-    [ForeignKey("organization")]
+    public ICollection<ProjectDeveloper> Developers { get; init; } = new HashSet<ProjectDeveloper>();
     public Guid OrganizationId { get; set; }
     public ICollection<ProjectFeedback> Feedbacks { get; set; } = new List<ProjectFeedback>();
 }

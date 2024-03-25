@@ -4,6 +4,7 @@ using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(OrganizationDBContext))]
-    partial class OrganizationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240324223104_fixing-developer-project-relationship4")]
+    partial class fixingdeveloperprojectrelationship4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,6 +44,30 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Contact");
+                });
+
+            modelBuilder.Entity("Domain.DeveloperNS.Developer", b =>
+                {
+                    b.Property<Guid>("UId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ContactId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StackName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UId");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("Developer");
                 });
 
             modelBuilder.Entity("Domain.OrganizationNS.Organization", b =>
@@ -112,6 +139,8 @@ namespace Data.Migrations
 
                     b.HasKey("UId");
 
+                    b.HasIndex("DeveloperId");
+
                     b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectDeveloper");
@@ -143,6 +172,17 @@ namespace Data.Migrations
                     b.ToTable("ProjectFeedback");
                 });
 
+            modelBuilder.Entity("Domain.DeveloperNS.Developer", b =>
+                {
+                    b.HasOne("Domain.ContactNS.Contact", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
             modelBuilder.Entity("Domain.OrganizationNS.Organization", b =>
                 {
                     b.HasOne("Domain.ContactNS.Contact", "Contact")
@@ -156,6 +196,10 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Domain.ProjectNS.ProjectDeveloper", b =>
                 {
+                    b.HasOne("Domain.DeveloperNS.Developer", null)
+                        .WithMany("ProjectDevelopers")
+                        .HasForeignKey("DeveloperId");
+
                     b.HasOne("Domain.ProjectNS.Project", null)
                         .WithMany("Developers")
                         .HasForeignKey("ProjectId");
@@ -168,6 +212,11 @@ namespace Data.Migrations
                         .HasForeignKey("ProjectUId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.DeveloperNS.Developer", b =>
+                {
+                    b.Navigation("ProjectDevelopers");
                 });
 
             modelBuilder.Entity("Domain.ProjectNS.Project", b =>

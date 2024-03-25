@@ -18,6 +18,5 @@ namespace Domain.DeveloperNS
         public string Name { get; set; }
         public Contact Contact { get; set; }
         public string StackName { get; set; }
-        public ICollection<ProjectDeveloper> ProjectDevelopers { get; set; }
     }
 }

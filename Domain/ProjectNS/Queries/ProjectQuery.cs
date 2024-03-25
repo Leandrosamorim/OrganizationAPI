@@ -9,4 +9,5 @@ public class ProjectQuery
 {
     public Guid OrganizationId { get; set; }
     public Guid DeveloperId { get; set; }
+    public Guid ProjectId { get; set; }
 }

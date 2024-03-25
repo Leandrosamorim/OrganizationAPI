@@ -12,6 +12,6 @@ public interface IProjectService
     Task<Project> Create(Project organization);
     Task<Project> Update(Project organization);
     Task Delete(Guid project);
-    Task AddProjectDeveloper(ProjectDeveloper projectDeveloper);
+    Task<bool> AddProjectDeveloper(Guid developerId, Guid projectId, Guid organizationId);
     Task RemoveProjectDeveloper(ProjectDeveloper projectDeveloper);
 }

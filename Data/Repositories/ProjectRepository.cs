@@ -25,8 +25,9 @@ public class ProjectRepository : IProjectRepository
     public async Task<IEnumerable<Project>> Get(ProjectQuery query)
     {
         return await _context.Project
-            .Where(x => (query.DeveloperId != null && x.Developers.Any(y => y.DeveloperId == query.DeveloperId)) || (query.OrganizationId != null && x.OrganizationId == query.OrganizationId))
-            .Include("ProjectDeveloper")
+            .Where(x => (query.DeveloperId != null && x.Developers.Any(y => y.DeveloperId == query.DeveloperId)) || (query.OrganizationId != null && x.OrganizationId == query.OrganizationId) || (query.ProjectId == x.UId))
+            .Include(x => x.Developers)
+            .Include(x => x.Feedbacks)
             .ToListAsync();
     }
 

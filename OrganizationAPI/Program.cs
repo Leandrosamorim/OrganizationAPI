@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Domain.HttpService;
 using Domain.HttpService.Interfaces;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

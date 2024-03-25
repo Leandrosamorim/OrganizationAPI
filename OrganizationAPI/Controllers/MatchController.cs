@@ -23,8 +23,8 @@ namespace OrganizationAPI.Controllers
             try
             {
                 var userUId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UId")?.Value);
-                var organizations = await _matchHttpService.GetMyMatches(userUId);
-                return Ok(organizations);
+                var developers = await _matchHttpService.GetMyMatches(userUId);
+                return Ok(developers);
             }
             catch
             {
