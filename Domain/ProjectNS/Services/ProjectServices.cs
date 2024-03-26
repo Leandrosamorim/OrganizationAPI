@@ -56,6 +56,22 @@ public class ProjectServices : IProjectService
 
     }
 
+    public async Task<IEnumerable<dynamic>> GetByDeveloperId(Guid developerId)
+    {
+        var project = await _projectRepository.Get(new ProjectQuery() { DeveloperId = developerId});
+
+        var result = project.Select(x => new
+        {
+            UId = x.UId,
+            Name = x.Name,
+            Description = x.Description,
+            Status = x.Status,
+            OrganizationId = x.OrganizationId,
+        });
+        return result;
+
+    }
+
     public async Task<bool> AddProjectDeveloper(Guid developerId, Guid projectId, Guid organizationId)
     {
         var myDevs = await _http.GetMyMatches(organizationId);
@@ -70,6 +86,20 @@ public class ProjectServices : IProjectService
             ProjectId = projectId
         });
         return true;
+
+    }
+
+    public async Task<bool> AddProjectFeedback(ProjectFeedback projectFeedback)
+    {
+        var myFeedback = await _projectRepository.GetProjectFeedback(projectFeedback);
+
+        if (myFeedback == default(ProjectFeedback))
+        {
+            await _projectRepository.AddProjectFeedback(projectFeedback);
+            return true;
+        }
+        
+        return false;
 
     }
 

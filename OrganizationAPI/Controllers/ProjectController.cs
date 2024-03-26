@@ -8,6 +8,7 @@ using Domain.ProjectNS.Commands;
 using Domain.ProjectNS.Queries;
 using System.Reflection;
 using System;
+using Microsoft.AspNetCore.Cors;
 
 namespace OrganizationAPI.Controllers;
 
@@ -49,13 +50,27 @@ public class ProjectController : Controller
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery]ProjectQuery query)
     {
-        if(query.OrganizationId == Guid.Empty && query.DeveloperId == Guid.Empty)
+        if(query.OrganizationId == Guid.Empty)
         {
             query.OrganizationId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UId")?.Value);
         }
         try
         {
             var project = await _projectService.Get(query);
+            return Ok(project);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex);
+        }
+    }
+    [Authorize]
+    [HttpGet("developerProjects")]
+    public async Task<IActionResult> GetByDeveloperId([FromQuery] Guid developerId)
+    {
+        try
+        {
+            var project = await _projectService.GetByDeveloperId(developerId);
             return Ok(project);
         }
         catch (Exception ex)
@@ -124,6 +139,22 @@ public class ProjectController : Controller
         try
         {
             await _projectService.RemoveProjectDeveloper(organizationId, projectId, developerId);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex);
+        }
+    }
+
+    [Authorize]
+    [EnableCors("DeveloperApi")]
+    [HttpPost($"feedback")]
+    public async Task<IActionResult> AddProjectFeedback([FromBody] ProjectFeedback projectFeedback)
+    {
+        try
+        {
+            await _projectService.AddProjectFeedback(projectFeedback);
             return Ok();
         }
         catch (Exception ex)

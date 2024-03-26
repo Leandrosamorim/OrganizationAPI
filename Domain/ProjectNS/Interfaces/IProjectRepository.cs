@@ -17,4 +17,6 @@ public interface IProjectRepository
     Task Delete(Guid project);
     Task AddProjectDeveloper(ProjectDeveloper projectDeveloper);
     Task RemoveProjectDeveloper(ProjectDeveloper projectDeveloper);
+    Task<ProjectFeedback?> GetProjectFeedback(ProjectFeedback projectFeedback);
+    Task AddProjectFeedback(ProjectFeedback projectFeedback);
 }

@@ -25,8 +25,14 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<IEnumerable<Project>> Get(ProjectQuery query)
     {
+        if (query.ProjectId != Guid.Empty)
+            return await _context.Project.Where(x => x.UId == query.ProjectId)
+                .Include(x => x.Developers)
+                .Include(x => x.Feedbacks)
+                .ToListAsync();
+        else
         return await _context.Project
-            .Where(x => (query.DeveloperId != null && x.Developers.Any(y => y.DeveloperId == query.DeveloperId)) || (query.OrganizationId != null && x.OrganizationId == query.OrganizationId) || (query.ProjectId == x.UId))
+            .Where(x => (query.DeveloperId != Guid.Empty && x.Developers.Any(y => y.DeveloperId == query.DeveloperId)) || (query.OrganizationId != Guid.Empty && x.OrganizationId == query.OrganizationId))
             .Include(x => x.Developers)
             .Include(x => x.Feedbacks)
             .ToListAsync();
@@ -66,6 +72,16 @@ public class ProjectRepository : IProjectRepository
         x.ProjectId == projectDeveloper.ProjectId &&
         x.DeveloperId == projectDeveloper.DeveloperId).FirstOrDefault();
         _context.ProjectDeveloper.Remove(projectDeveloperToRemove);
+        await _context.SaveChangesAsync();
+    }
+    public async Task<ProjectFeedback?> GetProjectFeedback(ProjectFeedback projectFeedback)
+    {
+        return _context.ProjectFeedback.Where(x => x.ProjectUId == projectFeedback.ProjectUId && x.DeveloperUId == projectFeedback.DeveloperUId).FirstOrDefault();
+    }
+
+    public async Task AddProjectFeedback(ProjectFeedback projectFeedback)
+    {
+        _context.ProjectFeedback.Add(projectFeedback);
         await _context.SaveChangesAsync();
     }
 }

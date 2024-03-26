@@ -17,4 +17,6 @@ public interface IProjectService
     Task RemoveProjectDeveloper(Guid organizationId, Guid projectId, Guid developerId);
 
     Task<ICollection<Developer>> GetDevelopersByProject(Guid organizationId, Guid projectId);
+    Task<IEnumerable<dynamic>> GetByDeveloperId(Guid developerId);
+    Task<bool> AddProjectFeedback(ProjectFeedback projectFeedback);
 }
